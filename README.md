@@ -23,6 +23,9 @@ xargs -L 1 curl -O -L < downloadCells.txt
 From RStudio run script: 
 ```organizeFilesIntoCellFolders.R```.
 \
-The script contains function, which requires 2 inputs: 
+The script contains function *moveBigWigs(cellMetadata, mainDir)*, which requires 2 inputs: 
 - name of the metadata file containing file name - cell type information (*metadata_cells.tsv*) 
-- name of a folder, where cell specific subdirectories hould be made and where the downloaded bigWig files are going to be moved
+- name of a folder conatining downloaded bigWig files
+
+Within the directory provided to *moveBigWigs* a cell specific subdirectories are created and the bigWig files connected to the given cell type are moved into the subdirectory. \
+
