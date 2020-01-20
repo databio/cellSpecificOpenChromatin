@@ -1,7 +1,8 @@
 # Cell type specific open chromatin signal matrix
 
 ### Prerequisities
-Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html :
+Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html:
+
     -primaryCells_bedGraph
 
 ## How to create:
