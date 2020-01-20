@@ -2,8 +2,9 @@
 
 ### Prerequisities
 Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html:
+\
+- bigWigToBedGraph
 
-    -primaryCells_bedGraph
 
 ## How to create:
 ### 1. Download signal tracks from ENCODE : /dataDownloadAndPreprocess
