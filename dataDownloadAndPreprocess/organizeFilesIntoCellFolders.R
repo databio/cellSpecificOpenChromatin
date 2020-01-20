@@ -4,12 +4,11 @@ library(filesstrings)
 ## the function takes as an input:
 #   -cellMetadata : metadata containing file name-cell type information (the one generated
 #                   from ENCODE and filtered by filterMetadata.R)
-#   -mainDir : path to a directory, where new subdirectiries will be created (one for each cell type),
-#              into which individual bigWig files are moved
+#   -mainDir : path to the directory containing unorganized bigWig files
 
 # set up a pathway, where cell specific subdirectories will be 
 # created and into which the cell specific bigWig files will be moved
-moveToDir = "/ENCODE_bigWigs/primaryCells"
+mainDir = "/ENCODE_bigWigs/primaryCells"
 
 # upload the metadata associated to primary cells
 cellMetadata = read.delim("metadata_cells.tsv")
@@ -50,5 +49,5 @@ moveBigWigs = function(cellMetadata, mainDir){
 }
 
 # run function with the meatada containing cell type - 
-moveBigWigs(cellMetadata, mainDir = moveToDir)
+moveBigWigs(cellMetadata, mainDir)
 
