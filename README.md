@@ -2,12 +2,16 @@
 
 ### Prerequisities
 Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html:
+- bedGraphToBigWig
+- bigWigMerge
 - bigWigToBedGraph
+
+- bedtools (http://quinlanlab.org/tutorials/bedtools/bedtools.html)
 
 
 ## How to create open chromatin signal matrix:
 
-## 1.-4. in */dataDownloadAndPreprocess* folder
+## 1.-9. in */dataDownloadAndPreprocess* folder
 Set up path to the folder */dataDownloadAndPreprocess* in your *.bash_profile*.
 ### 1. Download signal tracks from ENCODE 
 At ENCODE website apply criteria for file selection - hg19 / DNA accessibility / bigWig. Download *files.txt*. \
@@ -76,3 +80,26 @@ When following question pops up, give a full path to the file containing chromos
 What is the full path to the file with chromosome sizes?
 path_to_dataDownloadAndProcess/hg19chrom.sizes
 ```
+### 5. Download cell specific open chromatin BED files 
+At ENCODE website apply filtering criteia - DNA accessibility / hg19 / primary cell / bed narrowPeak. \
+Same as with the bigWig files, download the text document with links for BED file download (*dataDownloadAndProcess/BED_files/files.txt*) and diwnload the metadata from the first line (*dataDownloadAndProcess/BED_files/metadata.tsv*). \
+Run following script to select only trully hg19 BED files and have status *released*.
+```
+filterMetadata_BEDfiles.R
+```
+This script creates a new text file with filtered links: (*dataDownloadAndProcess/BED_files/downloadBEDfiles.txt*) \
+To get the BEd files run following from terminal:
+```
+cd BED_files
+xargs -L 1 curl -O -L < downloadBEDfiles.txt
+```
+### 6. Create a set of all possible open chromatin regions across cell types
+To create a universe of oll possible chromatin accessible regions run following command from the directory with all the downloaded BED files:
+```
+cat *.bed | sort -k1,1 -k2,2n | bedtools merge -i stdin > MasterPeaks.bed
+```
+### 7. Assign cell specific signal values to the genomic regions defined in step 6
+
+### 8. Merge individual signal tracks into matrix
+
+### 9. Normalize matrix
