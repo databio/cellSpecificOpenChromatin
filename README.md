@@ -7,7 +7,7 @@ Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html:
 
 ## How to create open chromatin signal matrix:
 
-## 1.-3. in */dataDownloadAndPreprocess* folder
+## 1.-4. in */dataDownloadAndPreprocess* folder
 Set up path to the folder */dataDownloadAndPreprocess* in your *.bash_profile*.
 ### 1. Download signal tracks from ENCODE 
 At ENCODE website apply criteria for file selection - hg19 / DNA accessibility / bigWig. Download *files.txt*. \
@@ -44,6 +44,7 @@ Followin step merges bigWig files coming from the same cell type. The output in 
 mkdir primaryCells_bedGraph
 cd primaryCells
 mergeBigWig.sh
+cd ..
 ```
 Following question pops out:
 ```
@@ -62,5 +63,16 @@ cd ..
 The combined blacklisted sites are then remove from the bedGraph files along with following chromosomes: chrY, chrM, chrUn, random, hap. The output is again a bedGraph file with suffix *_blRemoved*.
 
 ```
-
+cd primaryCells_bedGraph
+rmBlacklistSitesFrom_bedGraph.sh
+```
+### 4. Normalize the signal to 0-1 range
+From within the folder with cleaned bedGraph files run following script to normalize the signal to fall within 0-1 range. The unnormalized files are removed and the normalized bedGraph files are converted to bigWig files.
+```
+normalize_bedGraph01.sh
+```
+When following question pops up, give a full path to the file containing chromosome sizes.
+```
+What is the full path to the file with chromosome sizes?
+path_to_dataDownloadAndProcess/hg19chrom.sizes
 ```
