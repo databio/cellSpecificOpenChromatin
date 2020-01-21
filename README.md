@@ -98,7 +98,28 @@ To create a universe of oll possible chromatin accessible regions run following 
 ```
 cat *.bed | sort -k1,1 -k2,2n | bedtools merge -i stdin > MasterPeaks.bed
 ```
+You can now remove all the downloaded BEd files and keep only the *MasterPeaks.bed*.
+Create a 4th column in *MasterPeaks.bed* with names for individual peaks (e.g. chr_start_end) - otherwise and error will be generated in following step.
 ### 7. Assign cell specific signal values to the genomic regions defined in step 6
+Place the *MasterPeaks.bed* file into a directory, where it will be the only BED file. \
+From the folder with final normalised bigWig files run following script:
+```
+cellSpecificity_bigWigOverBed.sh
+```
+Following question pops out. Give the full path to the *folder* containing *MasterPeaks.bed* - example bellow.
+```
+What is the folder with your BED files?
+dataDownloadAndProcess/BED_files
+```
+A new directory will be created within a folder with bigWig files - */MasterPeaks_coverage*. It contains coverage files for individual cell types in the predefined regions. The columns in the TAB files are following:
+- name - name field from bed, which should be unique (the 4th column in BED file)
+- size - size of bed (sum of exon sizes
+- covered - # bases within exons covered by bigWig
+- sum - sum of values over all bases covered
+- mean0 - average over bases with non-covered bases counting as zeroes
+- mean - average over just covered bases
+- min  - minimum observed in the area
+- max  - maximum observed in the area
 
 ### 8. Merge individual signal tracks into matrix
 
