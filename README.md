@@ -2,14 +2,16 @@
 
 ### Prerequisities
 Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html:
-\
 - bigWigToBedGraph
 
 
-## How to create:
-### 1. Download signal tracks from ENCODE : /dataDownloadAndPreprocess
+## How to create open chromatin signal matrix:
+
+## 1.-3. in */dataDownloadAndPreprocess* folder
+Set up path to the folder */dataDownloadAndPreprocess* in your *.bash_profile*.
+### 1. Download signal tracks from ENCODE 
 At ENCODE website apply criteria for file selection - hg19 / DNA accessibility / bigWig. Download *files.txt*. \
-The first line contains the link to metadata connected to these files - download *metadata.tsv*.\
+The first line in *files.txt* contains the link to metadata connected to these files - download *metadata.tsv*.\
 \
 In RStudio run:
 ```filterMetadata.R```.
@@ -25,7 +27,7 @@ xargs -L 1 curl -O -L < downloadCells.txt
 cd ..
 ```
 
-### 2. Organize bigWig files into cell-specific subdirectories and merge  : /dataDownloadAndPreprocess
+### 2. Organize bigWig files into cell-specific subdirectories and merge 
 
 From RStudio run script: 
 ```organizeFilesIntoCellFolders.R```.
@@ -36,7 +38,7 @@ The script contains function *moveBigWigs(cellMetadata, mainDir)*, which require
 
 Within the directory provided to *moveBigWigs* a cell specific subdirectories are created and the bigWig files connected to the given cell type are moved into the subdirectory. 
 \
-Followin step merges bigWig files coming from the same cell type. The output in form of bedGraph files is moved to a user specified directory.
+Followin step merges bigWig files coming from the same cell type. The output in form of bedGraph files is moved to a directory specified by used.
 
 ``` 
 mkdir primaryCells_bedGraph
@@ -48,4 +50,17 @@ Following question pops out:
 What is the full path to the folder where outputs should be stored?
 path_to_dataDownloadAndProcess/primaryCells_bedGraph
 ```
-If a folder contains a single bigWig file an error is generated In these folders run ```bigWigToBedGraph``` manually
+If a folder contains a single bigWig file an error is generated In these folders run ```bigWigToBedGraph``` manually and move to a corresponding folder with all the other merged bedGraphs. 
+### 3. Remove ENCODE blacklisted sites and other problematic regions
+The files contain problematic regions. Some of them were defined by ENCODE - */dataDownloadAndPreprocess/blacklistedSites/ENCODE_blacklisted.bed* and some after visual inspection of bigWig files: */dataDownloadAndPreprocess/blacklistedSites/additional_blackList.bed*. 
+These are combined into */dataDownloadAndPreprocess/blacklistedSites/combined_Blacklist.bed* by running following from the terminal:
+```
+cd blacklistedSites
+cat *.bed | sort -k1,1 -k2,2n > combined_Blacklist.bed
+cd ..
+```
+The combined blacklisted sites are then remove from the bedGraph files along with following chromosomes: chrY, chrM, chrUn, random, hap. The output is again a bedGraph file with suffix *_blRemoved*.
+
+```
+
+```
