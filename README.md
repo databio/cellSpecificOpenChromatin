@@ -128,3 +128,4 @@ createOpenMatrix.R
 ```
 The script creates two matrices - one with maximum coverage value over the given region and one with mean0 value over the given region. Rows are individual genomic regions, columns are individual cell types. 
 ### 9. Normalize matrix
+Final step of creating the cell specific open chromatin matrix is quantile normalization. This is done by running ```normalizeOpenMatrix.R``` , where previously created matrix is passed to the variable *matrix_hg19*. The script creates the open chromatin cell specific matrix in its final form, which is called *openSignalMatrix_hg19_quantileNormalized_round4.txt*.
