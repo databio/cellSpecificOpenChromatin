@@ -5,6 +5,19 @@ library(tidyverse)
 library(GenomicRanges)
 library(data.table)
 
+# The function calcOpenSignal takes the input BED file, overlaps it with all defined
+# open chromatin regions across cell types and returns a matrix, where each row is 
+# the input genomic region (if overlap was found), each column is a cell type and the 
+# value is a normalized ATAC-seq signal in the region for the cell type.
+#
+# Inputs:
+# bedInput - the genomic regions to be analyzed in form of data.table, data.frame, or 
+#            GRanges object
+# genome - genome version can be either hg19 (default) or hg38
+# useSimpleCahce - defines if simpleCache should be used to upload signal matrix, 
+#             defaults to T
+# cacheDir - set up a directory for simpleCache, default is a tempdir
+
 calcOpenSignal = function(bedInput, 
                           genome = "hg19", 
                           useSimpleCache = T, 
@@ -16,13 +29,13 @@ calcOpenSignal = function(bedInput,
     setCacheDir(cacheDir)
     
     if (genome == "hg19"){
-      simpleCache("cellMatrix19",read.delim("openSignalMatrix_hg19_quantileNormalized_round4.txt.gz"))
+      simpleCache("cellMatrix19",read.delim("data/openSignalMatrix_hg19_quantileNormalized_round4.txt.gz"))
       cellMatrix = cellMatrix19
       
       colnames(cellMatrix) = gsub('\\.', '-', colnames(cellMatrix))
       colnames(cellMatrix) = gsub('xx', '', colnames(cellMatrix))
     } else if (genome == "hg38"){
-      simpleCache("cellMatrix38",read.delim("openSignalMatrix_hg38_quantileNormalized_round4.txt.gz"))
+      simpleCache("cellMatrix38",read.delim("data/openSignalMatrix_hg38_quantileNormalized_round4.txt.gz"))
       cellMatrix = cellMatrix38
       
       colnames(cellMatrix) = gsub('\\.', '-', colnames(cellMatrix))
@@ -34,9 +47,9 @@ calcOpenSignal = function(bedInput,
   } else {
     
     if (genome == "hg19"){
-      cellMatrix = read.delim("openSignalMatrix_hg19_quantileNormalized_round4.txt.gz")
+      cellMatrix = read.delim("data/openSignalMatrix_hg19_quantileNormalized_round4.txt.gz")
     } else if (genome == "hg38"){
-      cellMatrix = read.delim("openSignalMatrix_hg38_quantileNormalized_round4.txt.gz")
+      cellMatrix = read.delim("data/openSignalMatrix_hg38_quantileNormalized_round4.txt.gz")
     } else {
       stop("Unknown genome. Genome must be hg19 or hg38.")
     }
@@ -85,7 +98,24 @@ calcOpenSignal = function(bedInput,
   return(signalMatrix)
 }
 
-plotOpenSignal = function(signalMatrix, plotType = "jitter"){
+# The function plotOpenSignal visualizes the signalMatrix obtained from calcOpenSignal.
+#
+# Inputs:
+# signalMatrix - output data.frame from calcOpenSignal function
+# plotType - what plot type should be used to visualize the results, options are:
+#           jitter (default) - jitter plot with box plot on top / boxPlot - box plot
+#           without individual points and outliers / barPlot - bar height represents the
+#           median signal value for a given cell type
+# cellGroup - this option allows to selcet a group of cells to be plotted, if NA (default)
+#           all available cell groups are ploted, available options: {"blood", "bone", "CNS", 
+#           "embryonic", "eye", "foreskin", "gastrointestinal", "heart", "liver", "lymphatic", 
+#           "mammaryGland", "mouth", "respiratorySystem", "skeletalMuscle", "skin", 
+#            "urinarySystem", "vasculature"}, can be passed as a singe character string or vector
+#            of strings
+
+plotOpenSignal = function(signalMatrix, 
+                          plotType = "jitter", 
+                          cellGroup = NA){
   
   # hg 19 has 67 cell typer, hg38 has 74 cell types - 
   # based on this fact distinguish between geneome and upload metadata
@@ -108,6 +138,23 @@ plotOpenSignal = function(signalMatrix, plotType = "jitter"){
     left_join(metadata, by = "cellType") %>% 
     arrange(tissue, cellType) %>% 
     unite("mixedVar", tissue, cellType, sep = "_", remove = F)
+  
+  # if user defines cell group, filter the data
+  if (length(cellGroup) == 1){
+    if (is.na(cellGroup)){
+      plotSignalMatrix = plotSignalMatrix
+    } else if (cellGroup %in% levels(factor(metadata$tissue))){
+      plotSignalMatrix = plotSignalMatrix %>% 
+        filter(tissue == cellGroup)
+    } else {
+      stop("The input cell group is not in predefined list of options.")
+    }
+  } else if (all(cellGroup %in% levels(factor(metadata$tissue)))) {
+    plotSignalMatrix = plotSignalMatrix %>% 
+      filter(tissue %in% cellGroup)
+  } else {
+    stop("At least one of the input cell groups is not in predefined list of options.")
+  }
   
   # arrange labels in a way, that corresponding groups are plotted together
   myLabels = plotSignalMatrix  %>% 
@@ -185,11 +232,11 @@ plotOpenSignal = function(signalMatrix, plotType = "jitter"){
 }
 
 # upload the BED file to be analyzed
-bedInput = read.delim("/Users/lilcrusher/epigen_mal/H3K27ac/cell_specificity/top10percentBED/top10Negative_wk18.bed", 
+bedInput = read.delim("data/PBMC_example.bed", 
                       sep = "\t", header = F)
 # run the function
 signalMatrix = calcOpenSignal(bedInput)
-plotOpenSignal(signalMatrix, plotType = "jitter")
+plotOpenSignal(signalMatrix, plotType = "jitter", cellGroup = c("blood", "CNS"))
 plotOpenSignal(signalMatrix, plotType = "boxPlot")
 plotOpenSignal(signalMatrix, plotType = "barPlot")
 
