@@ -7,6 +7,9 @@ Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html:
 - bigWigToBedGraph
 
 - bedtools (http://quinlanlab.org/tutorials/bedtools/bedtools.html)
+R packages:
+- tidyverse
+- preprocessCore
 
 
 ## How to create open chromatin signal matrix:
