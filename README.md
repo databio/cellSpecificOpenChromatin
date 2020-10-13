@@ -10,6 +10,7 @@ Some of UCSC tools https://genome.ucsc.edu/goldenPath/help/bigWig.html:
 R packages:
 - tidyverse
 - preprocessCore
+- data.table
 
 
 ## How to create open chromatin signal matrix:
@@ -111,4 +112,8 @@ createOpenMatrix.R
 ```
 The script creates two matrices - one with maximum coverage value over the given region and one with mean0 value over the given region. Rows are individual genomic regions, columns are individual cell types. 
 ### 7. Normalize matrix
-Final step of creating the cell specific open chromatin matrix is quantile normalization. This is done by running ```normalizeOpenMatrix.R``` , where previously created matrix is passed to the variable *matrix_hg19*. The script creates the open chromatin cell specific matrix in its final form, which is called *openSignalMatrix_hg19_quantileNormalized_round4.txt*.
+Final step of creating the cell specific open chromatin matrix is normalization. This is done by running ```normalizeOpenMatrix.R``` , where previously created matrix is passed to the variable *rawMatrix*. The script creates the open chromatin cell specific matrix in its final form, which is called *meanCoverage_percentile99_01_quantNormalized_round4d.txt*.
+The normalization steps are following: 
+1) Set all values above 99th percentile for a given cell type to 1.
+2) Normalize the rest of the values to range from 0 to 1.
+3) Perform quantile normalization for cell types to be comparable.
